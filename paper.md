@@ -28,19 +28,10 @@ HippoRAG operates in two phases:
 Offline Indexing:
 
 Each passage is processed by an LLM (GPT-3.5-turbo by default; we use the same configuration) to extract named entities.
-A knowledge graph 
-G
-=
-(
-V
-,
-E
-)
-G=(V,E) is constructed where:
-V
-V = extracted named entities (nodes)
-E
-E = co-occurrence edges between entities appearing in the same passage
+A knowledge graph `G = (V, E)` is constructed where:
+- `V` = extracted named entities (nodes)
+- `E` = co-occurrence edges between entities appearing in the same passage
+
 Each passage is also encoded into a dense vector using the Contriever encoder.
 Online Retrieval:
 
@@ -52,131 +43,74 @@ PPR scores propagate through
 G
 G, re-ranking passages by their graph-weighted relevance to the query.
 2.2 Personalized PageRank (PPR)
-PPR computes a stationary distribution 
-π
-π of a random walk that, at each step, either:
+PPR computes a stationary distribution `π` of a random walk that, at each step, either:
+- Follows a graph edge with probability `1 − α`, or
+- Teleports back to the seed set with probability `α`.
 
-Follows a graph edge with probability 
-1
-−
-α
-1−α, or
-Teleports back to the seed set with probability 
-α
-α.
 Formally:
 
-π
-=
-α
-⋅
-v
-+
-(
-1
-−
-α
-)
-⋅
-A
-T
-π
-π=α⋅v+(1−α)⋅A 
-T
- π
-where 
-v
-v is the personalization vector (uniform over seed entities), 
-A
-A is the column-normalized adjacency matrix, and 
-α
-=
-0.15
-α=0.15 (standard damping factor). Passages linked to high-scoring entities are surfaced as additional candidates.
+```
+π = α·v + (1 − α)·Aᵀπ
+```
+
+where `v` is the personalization vector (uniform over seed entities), `A` is the
+column-normalized adjacency matrix, and `α = 0.15` (standard damping factor).
+Passages linked to high-scoring entities are surfaced as additional candidates.
 
 2.3 MuSiQue Benchmark
 MuSiQue (Multi-hop Sequential Questions) is a challenging multi-hop QA dataset where each question requires 2–4 sequential reasoning steps across multiple documents. It is designed to resist single-hop shortcuts, making it an ideal testbed for graph-based retrieval methods.
 
-Scale: 20,000 training + 2,417 development questions
-Evaluation subset used: 1,000 queries (random sample from development set)
-Metric: Recall@
-k
-k — whether the gold supporting passage appears in the top-
-k
-k retrieved results
+- Scale: 20,000 training + 2,417 development questions
+- Evaluation subset used: 1,000 queries (random sample from development set)
+- Metric: Recall@k — whether the gold supporting passage appears in the top-k retrieved results
 3. Experimental Setup
 3.1 Models and Components
-Component	Baseline (HippoRAG)	Variant (No-Graph)
-Dense Encoder	Contriever (facebook/contriever)	Contriever (facebook/contriever)
-Graph Construction LLM	GPT-3.5-turbo	— (not used)
-Graph Ranking	Personalized PageRank (α=0.15)	✗ Disabled
-Retrieval Method	Dense + PPR re-rank	Dense only (cosine similarity)
-Embedding Dim	768	768
+
+| Component | Baseline (HippoRAG) | Variant (No-Graph) |
+|---|---|---|
+| Dense Encoder | Contriever (facebook/contriever) | Contriever (facebook/contriever) |
+| Graph Construction LLM | GPT-3.5-turbo | — (not used) |
+| Graph Ranking | Personalized PageRank (α=0.15) | ✗ Disabled |
+| Retrieval Method | Dense + PPR re-rank | Dense only (cosine similarity) |
+| Embedding Dim | 768 | 768 |
+
 Note on LLM Usage: GPT-3.5-turbo (gpt-3.5-turbo-1106) is used only in the baseline for offline knowledge graph construction (entity and relation extraction). It is not involved in the retrieval process itself. The No-Graph variant skips this step entirely since there is no graph to build.
 
 3.2 Contriever
 Contriever (Izacard et al., 2022) is an unsupervised dense retrieval encoder trained via contrastive learning on web data, without any labeled QA pairs. It produces 768-dimensional vectors and has been widely adopted as a strong zero-shot baseline for open-domain QA retrieval.
 
 3.3 Hyperparameters
-Hyperparameter	Value
-Retrieval top-k (dense seed)	10
-PPR damping factor α	0.15
-PPR iterations	100
-Max passages per query	10
-Evaluation queries	1,000
-Dataset split	MuSiQue dev
-3.4 Evaluation Metric
-We report Recall@k (R@k), defined as:
 
-R
-@
-k
-=
-1
-∣
-Q
-∣
-∑
-q
-∈
-Q
-1
-[
-gold passage
-∈
-top-
-k
- retrieved for 
-q
-]
-R@k= 
-∣Q∣
-1
-​
-  
-q∈Q
-∑
-​
- 1[gold passage∈top-k retrieved for q]
-We evaluate at 
-k
-∈
-{
-2
-,
-5
-,
-10
-}
-k∈{2,5,10} to capture performance across different retrieval budgets.
+| Hyperparameter | Value |
+|---|---|
+| Retrieval top-k (dense seed) | 10 |
+| PPR damping factor α | 0.15 |
+| PPR iterations | 100 |
+| Max passages per query | 10 |
+| Evaluation queries | 1,000 |
+| Dataset split | MuSiQue dev |
+3.4 Evaluation Metric
+We report Recall@k (R@k), defined as the fraction of queries `Q` for which the
+gold supporting passage appears in the top-k retrieved results:
+
+```
+R@k = (1 / |Q|) × Σ 1[gold passage ∈ top-k retrieved for q], for q in Q
+```
+
+We evaluate at k ∈ {2, 5, 10} to capture performance across different retrieval budgets.
 
 4. Results
 4.1 Main Results Table
-Metric	Baseline (Contriever + PPR)	Variant (Contriever + No-Graph)	Δ (Variant − Baseline)	% Change
-R@2	0.3276	0.2995	−0.0281	−8.58%
-R@5	0.4037	0.3344	−0.0693	−17.17%
-R@10	0.4467	0.3528	−0.0939	−21.02%
+
+| Metric | Baseline (Contriever + PPR) | Variant (Contriever + No-Graph) | Δ (Variant − Baseline) | % Change |
+|--------|------------------------------|-----------------------------------|---------------------------|----------|
+| R@2    | 0.3276                       | 0.2995                            | −0.0281                   | −8.58%   |
+| R@5    | 0.4037                       | 0.3344                            | −0.0693                   | −17.17%  |
+| R@10   | 0.4467                       | 0.3528                            | −0.0939                   | −21.02%  |
+
 Both runs evaluated on the same 1,000 MuSiQue dev queries. Higher is better.
+
+![Recall Comparison Chart](./results/comparison_chart.png)
 
 4.2 Key Observations
 1. Graph reasoning is critical, not incremental.
@@ -227,86 +161,30 @@ Page, L., et al. (1999). The PageRank Citation Ranking: Bringing Order to the We
 Karpukhin, V., et al. (2020). Dense Passage Retrieval for Open-Domain Question Answering. EMNLP 2020.
 Edge, D., et al. (2024). From Local to Global: A Graph RAG Approach to Query-Focused Summarization. arXiv:2404.16130.
 Appendix A: Reproduction Steps
-bash
 
+```bash
 # 1. Clone HippoRAG
 git clone https://github.com/OSU-NLP-Group/HippoRAG
 cd HippoRAG
 pip install -r requirements.txt
+
 # 2. Set your OpenAI key (needed for graph construction in baseline)
 export OPENAI_API_KEY=your_key_here
+
 # 3. Run BASELINE (Contriever + PPR) on MuSiQue
 python src/hipporag/main.py \
   --dataset musique \
   --retriever contriever \
   --graph_alg ppr \
   --num_examples 1000
+
 # 4. Run VARIANT (Contriever + No-Graph)
 python src/hipporag/main.py \
   --dataset musique \
   --retriever contriever \
   --graph_alg none \
   --num_examples 1000
-# 5. Evaluate both outputs
-python src/hipporag/eval.py --results_path results/baseline/
-python src/hipporag/eval.py --results_path results/no_graph/
-Appendix B: GitHub README Template
-markdown
 
-# HippoRAG Ablation: Graph vs. No-Graph on MuSiQue
-Controlled ablation study comparing HippoRAG's full pipeline 
-(Contriever + PPR) vs. graph-free dense retrieval (Contriever only) 
-on MuSiQue multi-hop QA.
-## Results (n=1000 queries, MuSiQue dev)
-|
- Metric 
-|
- Contriever + PPR 
-|
- Contriever Only 
-|
- Δ       
-|
-|
---------
-|
------------------
-|
------------------
-|
----------
-|
-|
- R@2    
-|
- 0.3276          
-|
- 0.2995          
-|
- −8.58%  
-|
-|
- R@5    
-|
- 0.4037          
-|
- 0.3344          
-|
- −17.17% 
-|
-|
- R@10   
-|
- 0.4467          
-|
- 0.3528          
-|
- −21.02% 
-|
-## Key Finding
-The PPR graph component accounts for up to 21% improvement in 
-retrieval recall. Graph-free dense retrieval fails at multi-hop 
-reasoning that requires bridging across separate documents.
-## Setup
-See [paper](./paper.md) for full experimental details.
-Built on top of [HippoRAG](https://github.com/OSU-NLP-Group/HippoRAG) (NeurIPS 2024).
+# 5. Recompute recall + generate the comparison chart from this repo
+python compute_recall.py
+```
