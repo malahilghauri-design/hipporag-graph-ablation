@@ -1,0 +1,4 @@
+Paired bootstrap, n=1000 queries, 10000 resamples, seed=0
+R@2: mean diff (PPR - no-graph) = +0.0281, 95% CI [+0.0208, +0.0357]; queries improved=74, worsened=7
+R@5: mean diff (PPR - no-graph) = +0.0693, 95% CI [+0.0587, +0.0803]; queries improved=164, worsened=9
+R@10: mean diff (PPR - no-graph) = +0.0938, 95% CI [+0.0819, +0.1060]; queries improved=224, worsened=7
