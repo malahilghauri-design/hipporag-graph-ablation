@@ -26,7 +26,7 @@ graph reasoning is the main driver of HippoRAG's gains.
 ![Recall Comparison Chart](./results/comparison_chart.png)
 
 ## Repository Structure
-
+See docs/ARCHITECTURE.md for the data flow.
 ```
 hipporag-graph-ablation/
 ├── README.md               # this file
@@ -73,14 +73,13 @@ retrieval experiment itself.
   not in this repo. See Provenance below.
 - Percent drops in the table are relative; absolute differences are in
   `results/bootstrap_ci.txt`.
+  ## Provenance
 
-## Provenance
-
-- Retrieval run: [ADD Kaggle notebook link, or write: "Not available. The JSON
-  files come from an earlier run and no configuration was saved."]
-- Based on HippoRAG's original pipeline and code (OSU-NLP-Group). My
-  contribution: [ADD what you actually did, e.g. Python 3.12 patches, running
-  the two configurations, `compute_recall.py`, `bootstrap_ci.py`, paper.md].
+- Retrieval run: Not available. The two JSON files in `results/` come from an earlier run on Kaggle, and no run configuration was saved.
+- Based on HippoRAG's original pipeline and code (OSU-NLP-Group). 
+My contribution: running the two configurations (with and without PPR) on
+  MuSiQue, the Python 3.12 patches, `compute_recall.py`, `bootstrap_ci.py`,
+  and the write-up in `paper.md`.
 
 ## Citation
 
