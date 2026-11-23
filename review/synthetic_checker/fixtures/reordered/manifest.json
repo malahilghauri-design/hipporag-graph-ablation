@@ -1,0 +1,19 @@
+{
+  "dataset_id": "musique-dev-synthetic",
+  "metric": "recall",
+  "scale": "per-query",
+  "k": 10,
+  "revision": "v0.3",
+  "files": {
+    "baseline.json": {
+      "sha256": "7147c27c3e93e771db8994e33a23714aa38418c437620d64c0694ec9cbd6bb5b",
+      "n": 5,
+      "mean_score": 0.6
+    },
+    "variant.json": {
+      "sha256": "12c5f9aa0beb176428f07fa0b4c574cefbf20e786f02cd3046c8fbd15eb607dd",
+      "n": 5,
+      "mean_score": 0.4
+    }
+  }
+}

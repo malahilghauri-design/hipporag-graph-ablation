@@ -1,0 +1,42 @@
+[
+  {
+    "query_id": "syn-q01",
+    "dataset_id": "musique-dev-synthetic",
+    "metric": "recall",
+    "scale": "per-query",
+    "k": 10,
+    "score": 1
+  },
+  {
+    "query_id": "syn-q02",
+    "dataset_id": "musique-dev-synthetic",
+    "metric": "recall",
+    "scale": "per-query",
+    "k": 10,
+    "score": 0
+  },
+  {
+    "query_id": "syn-q03",
+    "dataset_id": "musique-dev-synthetic",
+    "metric": "recall",
+    "scale": "per-query",
+    "k": 10,
+    "score": 0
+  },
+  {
+    "query_id": "syn-q04",
+    "dataset_id": "musique-dev-synthetic",
+    "metric": "recall",
+    "scale": "per-query",
+    "k": 10,
+    "score": 1
+  },
+  {
+    "query_id": "syn-q99",
+    "dataset_id": "musique-dev-synthetic",
+    "metric": "recall",
+    "scale": "per-query",
+    "k": 10,
+    "score": 0
+  }
+]

@@ -1,0 +1,31 @@
+{
+  "status": "diagnostic",
+  "revision": "v0.3",
+  "dataset_id": "musique-dev-synthetic",
+  "metric": "recall",
+  "scale": "per-query",
+  "k": 10,
+  "n": null,
+  "baseline_mean": 0.6,
+  "variant_mean": 0.4,
+  "mean_diff": null,
+  "improved": 0,
+  "worsened": 0,
+  "tied": 0,
+  "errors": [
+    {
+      "code": "id_mismatch",
+      "file": "variant.json",
+      "query_id": "syn-q05",
+      "field": "query_id",
+      "message": "query_id syn-q05 is in baseline but not in variant"
+    },
+    {
+      "code": "id_mismatch",
+      "file": "baseline.json",
+      "query_id": "syn-q99",
+      "field": "query_id",
+      "message": "query_id syn-q99 is in variant but not in baseline"
+    }
+  ]
+}

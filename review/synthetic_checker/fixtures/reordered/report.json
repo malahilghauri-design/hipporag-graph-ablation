@@ -1,0 +1,16 @@
+{
+  "status": "validated",
+  "revision": "v0.3",
+  "dataset_id": "musique-dev-synthetic",
+  "metric": "recall",
+  "scale": "per-query",
+  "k": 10,
+  "n": 5,
+  "baseline_mean": 0.6,
+  "variant_mean": 0.4,
+  "mean_diff": 0.2,
+  "improved": 1,
+  "worsened": 0,
+  "tied": 4,
+  "errors": []
+}
